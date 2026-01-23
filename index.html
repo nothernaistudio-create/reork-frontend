@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>REORK</title>
+</head>
+<body>
+  <h1>REORK – Test Frontend</h1>
+
+  <textarea id="message" placeholder="Type or paste text here..." rows="6" style="width:100%;"></textarea>
+
+  <br><br>
+
+  <input type="file" id="file" />
+
+  <br><br>
+
+  <button onclick="send()">Send</button>
+
+  <pre id="response"></pre>
+
+  <script>
+    async function send() {
+      const message = document.getElementById("message").value;
+
+      const res = await fetch("https://reork-backend.onrender.com/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: message }]
+        })
+      });
+
+      const data = await res.json();
+      document.getElementById("response").textContent =
+        data.choices?.[0]?.message?.content || JSON.stringify(data);
+    }
+  </script>
+</body>
+</html>
