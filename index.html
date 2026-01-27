@@ -3,12 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>REORK</title>
+  <title>REORK – Test Frontend</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    pre {
+      background: #111;
+      color: #0f0;
+      padding: 15px;
+      margin-top: 15px;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
+
 <body>
   <h1>REORK – Test Frontend</h1>
 
-  <textarea id="message" placeholder="Type or paste text here..." rows="6" style="width:100%;"></textarea>
+  <textarea
+    id="message"
+    placeholder="Type something like: Explain this document"
+  ></textarea>
 
   <br><br>
 
@@ -22,19 +55,33 @@
 
   <script>
     async function send() {
-      const message = document.getElementById("message").value;
+      const message = document.getElementById("message").value || "";
+      const fileInput = document.getElementById("file");
+      const responseBox = document.getElementById("response");
 
-      const res = await fetch("https://reork-backend.onrender.com/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: message }]
-        })
-      });
+      responseBox.textContent = "Thinking...";
 
-      const data = await res.json();
-      document.getElementById("response").textContent =
-        data.choices?.[0]?.message?.content || JSON.stringify(data);
+      try {
+        // IMPORTANT: Use FormData so files can be uploaded
+        const formData = new FormData();
+        formData.append("message", message);
+
+        // Backend expects the field name to be exactly "file"
+        if (fileInput.files.length > 0) {
+          formData.append("file", fileInput.files[0]);
+        }
+
+        const res = await fetch("https://reork-backend.onrender.com/api/chat", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+        responseBox.textContent = data.reply || JSON.stringify(data, null, 2);
+
+      } catch (err) {
+        responseBox.textContent = "ERROR: " + err.message;
+      }
     }
   </script>
 </body>
