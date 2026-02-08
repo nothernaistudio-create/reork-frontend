@@ -1,124 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>REORK Assistant</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REORK</title>
 
 <style>
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0f0f0f;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  font-family: Arial, sans-serif;
+  background: #1c1c1c;
+  color: #eee;
+  padding: 20px;
 }
 
-header {
-    padding: 15px;
-    background: #111;
-    border-bottom: 1px solid #222;
-    font-size: 18px;
+h1 {
+  color: #ff7a00;
+  font-size: 32px;
+  margin-bottom: 10px;
 }
 
-#chat {
-    flex: 1;
-    padding: 15px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.message {
-    max-width: 75%;
-    padding: 10px 14px;
-    border-radius: 12px;
-    line-height: 1.4;
-    white-space: pre-wrap;
+#chatWindow {
+  height: 400px;
+  overflow-y: auto;
+  border: 1px solid #333;
+  padding: 10px;
+  background: #2a2a2a;
+  margin-bottom: 10px;
+  border-radius: 6px;
 }
 
 .user {
-    align-self: flex-end;
-    background: #1e88e5;
+  text-align: right;
+  margin: 6px 0;
+  color: #ffffff;
 }
 
 .assistant {
-    align-self: flex-start;
-    background: #222;
+  text-align: left;
+  margin: 6px 0;
+  color: #ffb347;
 }
 
-footer {
-    padding: 10px;
-    background: #111;
-    border-top: 1px solid #222;
-    display: flex;
-    gap: 10px;
+#inputBar {
+  display: flex;
+  gap: 10px;
 }
 
 textarea {
-    flex: 1;
-    resize: none;
-    height: 60px;
-    border-radius: 8px;
-    border: none;
-    padding: 10px;
-    font-size: 14px;
+  flex: 1;
+  height: 55px;
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 10px;
+  border-radius: 6px;
+  resize: none;
+  font-size: 14px;
 }
 
 button {
-    background: #1e88e5;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 0 16px;
-    cursor: pointer;
+  background: #ff7a00;
+  border: none;
+  padding: 10px 16px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 button:hover {
-    background: #1565c0;
-}
-
-.reset-btn {
-    background: #444;
+  background: #ff9c33;
 }
 </style>
 </head>
 
 <body>
 
-<header>REORK Assistant</header>
+<h1>REORK</h1>
 
-<div id="chat"></div>
+<div id="chatWindow"></div>
 
-<footer>
-    <textarea id="messageInput" placeholder="Ask REORK anything..."></textarea>
-    <button onclick="sendMessage()">Send</button>
-    <button class="reset-btn" onclick="resetConversation()">Reset</button>
-</footer>
+<div id="inputBar">
+  <textarea id="messageInput" placeholder="Ask REORK anything..."></textarea>
+  <button onclick="sendMessage()">Send</button>
+  <button onclick="resetChat()">Reset</button>
+</div>
 
 <script>
-const chat = document.getElementById("chat");
-const input = document.getElementById("messageInput");
+const chatWindow = document.getElementById("chatWindow");
+const messageInput = document.getElementById("messageInput");
 
-function addMessage(text, sender) {
-    const msg = document.createElement("div");
-    msg.classList.add("message", sender);
-    msg.textContent = text;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
+function addMessage(role, text) {
+  const msg = document.createElement("div");
+  msg.className = role;
+  msg.innerText = text;
+  chatWindow.appendChild(msg);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 async function sendMessage() {
-    const message = input.value.trim();
-    if (!message) return;
+  const message = messageInput.value.trim();
+  if (!message) return;
 
-    addMessage(message, "user");
-    input.value = "";
+  addMessage("user", "You: " + message);
+  messageInput.value = "";
 
-    try {
-        const response = await fetch("https://reork-backend.onrender.com/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+  const response = await fetch("https://reork-backend.onrender.com/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message })
+  });
+
+  const data = await response.json();
+  addMessage("assistant", "REORK: " + data.reply);
+}
+
+async function resetChat() {
+  await fetch("https://reork-backend.onrender.com/api/reset", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId: "default" })
+  });
+
+  chatWindow.innerHTML = "";
+}
+</script>
+
+</body>
+</html>
