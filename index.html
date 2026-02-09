@@ -40,7 +40,6 @@
       user-select:none;
     }
 
-    /* REORK logo styling stays “tunnel” */
     .brand{
       font-weight:800;
       letter-spacing: 1px;
@@ -105,6 +104,8 @@
       line-height: 1.5;
       white-space: pre-wrap;
       word-break: break-word;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
     }
 
     .bot .bubble{
@@ -125,7 +126,6 @@
       opacity:.85;
     }
 
-    /* Composer */
     #composer{
       border-top: 1px solid rgba(255,255,255,.06);
       padding-top: 14px;
@@ -137,7 +137,15 @@
       gap:10px;
     }
 
-    /* PLUS BUTTON (square orange) */
+    /* LEFT BUTTONS */
+    #leftButtons{
+      display:flex;
+      gap:10px;
+      flex:0 0 auto;
+      align-items:stretch;
+    }
+
+    /* PLUS BUTTON */
     #attachBtn{
       width:52px;
       height:52px;
@@ -149,7 +157,6 @@
       align-items:center;
       justify-content:center;
       box-shadow: 0 10px 24px rgba(255,122,0,.18);
-      flex:0 0 auto;
     }
     #attachBtn:active{ transform: translateY(1px); }
     #attachBtn span{
@@ -160,34 +167,55 @@
       transform: translateY(-1px);
     }
 
-    /* MIC BUTTON (matches size, REORK style) */
+    /* MIC BUTTON (matches +) */
     #micBtn{
       width:52px;
       height:52px;
-      background: rgba(255,255,255,.10);
-      border: 1px solid rgba(255,255,255,.12);
+      background: var(--accent);
+      border: none;
       border-radius: 10px;
       cursor:pointer;
       display:flex;
       align-items:center;
       justify-content:center;
-      box-shadow: 0 10px 24px rgba(0,0,0,.18);
-      flex:0 0 auto;
+      box-shadow: 0 10px 24px rgba(255,122,0,.18);
+      position: relative;
     }
     #micBtn:active{ transform: translateY(1px); }
-    #micBtn span{
-      font-size: 20px;
-      color: var(--accent);
-      line-height: 1;
-      transform: translateY(1px);
-    }
-    #micBtn.listening{
-      border-color: rgba(255,122,0,.55);
-      box-shadow: 0 0 0 4px rgba(255,122,0,.12);
-      background: rgba(255,122,0,.08);
+
+    /* icon */
+    #micBtn svg{
+      width:22px;
+      height:22px;
+      fill:#1a1a1a;
     }
 
-    /* Input looks like ChatGPT: clears after send, history stays above */
+    /* recording state */
+    #micBtn.recording{
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 0 0 4px rgba(255,122,0,.12);
+    }
+    #micBtn.recording svg{
+      fill: var(--accent);
+    }
+    /* subtle pulse ring */
+    #micBtn.recording::after{
+      content:"";
+      position:absolute;
+      inset:-6px;
+      border-radius: 14px;
+      border: 2px solid rgba(255,122,0,.25);
+      animation: pulse 1.2s ease-in-out infinite;
+      pointer-events:none;
+    }
+
+    @keyframes pulse{
+      0%   { transform: scale(0.98); opacity: 0.35; }
+      50%  { transform: scale(1.05); opacity: 0.65; }
+      100% { transform: scale(0.98); opacity: 0.35; }
+    }
+
     #inputBox{
       flex:1;
       display:flex;
@@ -206,6 +234,11 @@
       color: var(--text);
       padding: 14px 14px;
       font-size: 16px;
+
+      /* FIX: make typing look normal, not code */
+      font-family: Arial, Helvetica, sans-serif;
+      letter-spacing: 0.2px;
+
       outline:none;
     }
     #input:focus{
@@ -213,7 +246,6 @@
       box-shadow: 0 0 0 4px rgba(255,122,0,.12);
     }
 
-    /* Attachment pill */
     #attachPill{
       display:none;
       align-items:center;
@@ -286,7 +318,6 @@
       border: 1px solid rgba(255,255,255,.10);
     }
 
-    /* Hidden native file input */
     #fileInput{
       display:none;
     }
@@ -304,6 +335,7 @@
     .status{
       color: rgba(255,255,255,.6);
       font-size: 12px;
+      min-height: 16px;
     }
   </style>
 </head>
@@ -320,19 +352,25 @@
 
     <div id="composer">
       <div id="composeRow">
-        <button id="attachBtn" type="button" title="Attach file">
-          <span>+</span>
-        </button>
 
-        <button id="micBtn" type="button" title="Voice input">
-          <span>🎤</span>
-        </button>
+        <div id="leftButtons">
+          <button id="attachBtn" type="button" title="Attach PDF">
+            <span>+</span>
+          </button>
+
+          <button id="micBtn" type="button" title="Voice input">
+            <!-- simple mic icon -->
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/>
+            </svg>
+          </button>
+        </div>
 
         <div id="inputBox">
           <textarea id="input" placeholder="Ask REORK anything..."></textarea>
 
           <div id="attachPill">
-            <span class="tag" id="attachTag">FILE</span>
+            <span class="tag">PDF</span>
             <span class="name" id="attachName"></span>
             <button id="removeAttach" type="button" title="Remove">×</button>
           </div>
@@ -349,27 +387,27 @@
         <div class="status">Enter to send • Shift+Enter for new line</div>
       </div>
 
-      <!-- Allow PDFs + images. Backend will read PDFs today; images are groundwork for later. -->
-      <input id="fileInput" type="file" accept="application/pdf,.pdf,image/png,image/jpeg,image/jpg,.png,.jpg,.jpeg" />
+      <input id="fileInput" type="file" accept="application/pdf,.pdf" />
     </div>
   </div>
 
 <script>
 /**
- * This version keeps your structure and UI, but fixes:
- * - Frontend sending sessionId (backend memory)
- * - Frontend sending files correctly (FormData)
- * - Clears attachment after send (so it doesn't stick)
- * - Adds mic button (speech-to-text) in the same composer row
- * - Reset also clears backend memory via /api/reset
+ * Frontend responsibilities:
+ * - Chat UI
+ * - Send message + optional PDF via FormData
+ * - Voice input toggle (start/stop) with a safety timeout
  */
 
 // ==============================
 // CONFIG
 // ==============================
 const API_URL = "https://reork-backend.onrender.com/api/chat";
-const RESET_URL = "https://reork-backend.onrender.com/api/reset";
 const FRONTEND_CONTEXT_LIMIT = 20;
+
+// Voice safety timeout (prevents “left it recording forever”)
+// 45s feels close to ChatGPT behavior without being annoying.
+const VOICE_MAX_MS = 45000;
 
 // ==============================
 // STATE
@@ -377,16 +415,10 @@ const FRONTEND_CONTEXT_LIMIT = 20;
 let messages = []; // {role:"user"|"assistant", content:"..."}
 let attachedFile = null;
 
-// Persist a sessionId so backend memory works per user session
-let sessionId = localStorage.getItem("reork_sessionId");
-if (!sessionId) {
-  sessionId = "sess_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
-  localStorage.setItem("reork_sessionId", sessionId);
-}
-
-// Speech recognition state
+// voice state
 let recognition = null;
-let isListening = false;
+let isRecording = false;
+let voiceTimer = null;
 
 // ==============================
 // DOM
@@ -396,13 +428,12 @@ const inputEl = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
 const resetBtn = document.getElementById("resetBtn");
 const attachBtn = document.getElementById("attachBtn");
-const micBtn = document.getElementById("micBtn");
 const fileInput = document.getElementById("fileInput");
 const attachPill = document.getElementById("attachPill");
 const attachName = document.getElementById("attachName");
-const attachTag = document.getElementById("attachTag");
 const removeAttach = document.getElementById("removeAttach");
 const statusText = document.getElementById("statusText");
+const micBtn = document.getElementById("micBtn");
 
 // ==============================
 // HELPERS
@@ -455,21 +486,11 @@ function clearAttachment(){
   fileInput.value = "";
   attachPill.style.display = "none";
   attachName.textContent = "";
-  attachTag.textContent = "FILE";
 }
 
 function showAttachment(file){
   attachedFile = file;
   attachName.textContent = file.name;
-
-  const name = (file.name || "").toLowerCase();
-  const type = (file.type || "").toLowerCase();
-
-  if (type.includes("pdf") || name.endsWith(".pdf")) attachTag.textContent = "PDF";
-  else if (type.includes("png") || name.endsWith(".png")) attachTag.textContent = "PNG";
-  else if (type.includes("jpeg") || type.includes("jpg") || name.endsWith(".jpg") || name.endsWith(".jpeg")) attachTag.textContent = "JPG";
-  else attachTag.textContent = "FILE";
-
   attachPill.style.display = "inline-flex";
 }
 
@@ -490,7 +511,13 @@ function disableWhileWorking(on){
   sendBtn.disabled = !!on;
   attachBtn.disabled = !!on;
   micBtn.disabled = !!on;
-  resetBtn.disabled = !!on;
+  if (on) {
+    attachBtn.style.opacity = "0.65";
+    micBtn.style.opacity = "0.65";
+  } else {
+    attachBtn.style.opacity = "";
+    micBtn.style.opacity = "";
+  }
 }
 
 // ==============================
@@ -498,17 +525,9 @@ function disableWhileWorking(on){
 // ==============================
 async function sendToBackend(userText){
   const fd = new FormData();
-
-  // Backend expects these fields:
   fd.append("message", userText);
-  fd.append("sessionId", sessionId);
-
-  // Keep sending history (even if backend ignores it today, it doesn't break anything)
   fd.append("history", JSON.stringify(getTrimmedContext()));
-
-  if (attachedFile) {
-    fd.append("file", attachedFile, attachedFile.name);
-  }
+  if (attachedFile) fd.append("file", attachedFile, attachedFile.name);
 
   const resp = await fetch(API_URL, { method: "POST", body: fd });
 
@@ -526,146 +545,200 @@ async function sendToBackend(userText){
   }
 }
 
-async function resetBackendMemory(){
-  // Not fatal if it fails, but we try.
-  try{
-    await fetch(RESET_URL, {
-      method: "POST",
-      headers: { "Content-Type":"application/json" },
-      body: JSON.stringify({ sessionId })
-    });
-  }catch(_){}
-}
-
 // ==============================
-// UI EVENTS
+// FILE UI
 // ==============================
 attachBtn.addEventListener("click", () => fileInput.click());
 
 fileInput.addEventListener("change", () => {
   const f = fileInput.files && fileInput.files[0];
   if (!f) return;
+
+  const isPdf = (f.type === "application/pdf") || f.name.toLowerCase().endsWith(".pdf");
+  if (!isPdf) {
+    clearAttachment();
+    addAssistant("For now, PDF only. Please choose a .pdf file.");
+    return;
+  }
   showAttachment(f);
 });
 
-removeAttach.addEventListener("click", () => clearAttachment());
+removeAttach.addEventListener("click", clearAttachment);
 
-resetBtn.addEventListener("click", async () => {
-  // Clear UI + local history
+// ==============================
+// VOICE (TOGGLE START/STOP)
+// ==============================
+function setupSpeech(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+
+  const rec = new SR();
+
+  // We want clean text after speaking, not live flicker
+  rec.interimResults = false;
+
+  // Keep listening until user stops OR timeout hits
+  rec.continuous = true;
+
+  rec.lang = "en-US";
+
+  return rec;
+}
+
+function startVoice(){
+  if (isRecording) return;
+
+  if (!recognition) recognition = setupSpeech();
+  if (!recognition) {
+    addAssistant("Voice input isn’t supported in this browser. Try Chrome on desktop.");
+    return;
+  }
+
+  // Clear any existing timer
+  if (voiceTimer) {
+    clearTimeout(voiceTimer);
+    voiceTimer = null;
+  }
+
+  isRecording = true;
+  micBtn.classList.add("recording");
+  setStatus("Listening… (click mic again to stop)");
+
+  // Accumulate results for this recording session
+  let finalText = "";
+
+  recognition.onresult = (event) => {
+    // Collect final transcript segments
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const res = event.results[i];
+      if (res && res[0] && res.isFinal) {
+        finalText += (finalText ? " " : "") + res[0].transcript.trim();
+      }
+    }
+  };
+
+  recognition.onerror = (e) => {
+    stopVoice(true);
+    addAssistant("Voice input error: " + (e && e.error ? e.error : "unknown"));
+  };
+
+  recognition.onend = () => {
+    // Browser can end automatically; if we were recording, treat it as stop
+    if (!isRecording) return;
+    // End can fire after stop() too; we only finalize once in stopVoice()
+  };
+
+  // Safety timeout (prevents “left it on”)
+  voiceTimer = setTimeout(() => {
+    stopVoice(false, true);
+  }, VOICE_MAX_MS);
+
+  // Start listening
+  try {
+    recognition.start();
+  } catch (err) {
+    // start can throw if called twice quickly
+    isRecording = false;
+    micBtn.classList.remove("recording");
+    setStatus("");
+  }
+
+  // When we stop, we need to write the captured text once.
+  // We'll do that by hooking into stopVoice which reads from the local closure:
+  micBtn._finalTextRef = () => finalText;
+}
+
+function stopVoice(silent=false, timedOut=false){
+  if (!isRecording) return;
+
+  isRecording = false;
+  micBtn.classList.remove("recording");
+
+  if (voiceTimer) {
+    clearTimeout(voiceTimer);
+    voiceTimer = null;
+  }
+
+  setStatus(timedOut ? "Stopped (time limit reached)." : "");
+
+  // Stop recognition
+  try { recognition && recognition.stop(); } catch(e){}
+
+  // Finalize into input after a short beat so the last result can land
+  setTimeout(() => {
+    const getter = micBtn._finalTextRef;
+    const text = getter ? getter() : "";
+    micBtn._finalTextRef = null;
+
+    // Clean up repeated stutter-y duplicates: simple de-dupe of immediate repeats
+    // (Not perfect, but reduces "this this this")
+    const cleaned = text
+      .replace(/\b(\w+)(\s+\1\b)+/gi, "$1")
+      .trim();
+
+    if (!silent) {
+      if (cleaned) {
+        // Put text in the input box (append if user already typed)
+        inputEl.value = (inputEl.value.trim() ? (inputEl.value.trim() + " ") : "") + cleaned;
+        inputEl.focus();
+      } else if (timedOut) {
+        // timed out with no usable speech
+        // keep status minimal and not spam the chat
+      }
+    }
+  }, 150);
+}
+
+micBtn.addEventListener("click", () => {
+  if (!isRecording) startVoice();
+  else stopVoice(false, false);
+});
+
+// ==============================
+// RESET
+// ==============================
+resetBtn.addEventListener("click", () => {
   chatEl.innerHTML = "";
   messages = [];
   clearAttachment();
   inputEl.value = "";
   setStatus("");
 
-  // Clear backend memory too
-  await resetBackendMemory();
+  // stop voice if active
+  stopVoice(true, false);
 
-  addAssistant("Tell me what’s going on, and we’ll work through it together.");
+  addAssistant(
+    "Hey. Tell me what you're working through, and I'll walk with you step by step.\n\n" +
+    "If you're sharing numbers (price, rate, dates, totals), paste them and I'll translate it into plain English."
+  );
 });
 
 // ==============================
-// VOICE INPUT (Speech → Text)
-// ==============================
-function getSpeechRecognition(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return null;
-  const r = new SR();
-  r.lang = "en-US";
-  r.interimResults = true;
-  r.continuous = false;
-  return r;
-}
-
-function startListening(){
-  if (isListening) return;
-
-  const r = getSpeechRecognition();
-  if (!r) {
-    addAssistant("Voice input isn’t supported in this browser. If you want it, use Chrome on desktop.");
-    return;
-  }
-
-  recognition = r;
-  isListening = true;
-  micBtn.classList.add("listening");
-  setStatus("Listening…");
-
-  let finalText = "";
-
-  recognition.onresult = (event) => {
-    let interim = "";
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const chunk = event.results[i][0].transcript;
-      if (event.results[i].isFinal) finalText += chunk;
-      else interim += chunk;
-    }
-
-    // Show interim in the input without committing it permanently
-    const base = inputEl.value;
-    // If user is actively typing, we don't wipe it. We append voice after a space.
-    const prefix = base && !base.endsWith(" ") ? base + " " : base;
-    inputEl.value = prefix + (finalText || interim);
-  };
-
-  recognition.onerror = () => {
-    stopListening();
-    setStatus("");
-  };
-
-  recognition.onend = () => {
-    stopListening();
-  };
-
-  try{
-    recognition.start();
-  }catch(_){
-    stopListening();
-  }
-}
-
-function stopListening(){
-  isListening = false;
-  micBtn.classList.remove("listening");
-  if (recognition) {
-    try{ recognition.stop(); }catch(_){}
-  }
-  recognition = null;
-  setStatus("");
-}
-
-micBtn.addEventListener("click", () => {
-  if (isListening) stopListening();
-  else startListening();
-});
-
-// ==============================
-// SEND MESSAGE
+// SEND
 // ==============================
 async function handleSend(){
   const text = inputEl.value.trim();
-
-  // Allow sending even if only a file is attached
-  if (!text && !attachedFile) return;
+  if (!text) return;
   if (!ensureApiConfigured()) return;
 
-  // User bubble
-  addUser(text || "[Attached file]");
+  // If mic is recording, stop it before sending
+  if (isRecording) stopVoice(true, false);
+
+  addUser(text);
   inputEl.value = "";
 
   disableWhileWorking(true);
-  setStatus("Thinking...");
+  setStatus("Thinking…");
 
   try{
-    const reply = await sendToBackend(text || "");
+    const reply = await sendToBackend(text);
     const safeReply = reply && reply.trim() ? reply.trim() : "I didn’t get a response back. Try again.";
     addAssistant(safeReply);
   }catch(err){
     addAssistant("Something went wrong talking to the backend.\n\n" + (err && err.message ? err.message : String(err)));
   }finally{
-    // IMPORTANT: clear attachment after send so it doesn't stick in the bar
+    // IMPORTANT: clear attachment after send so it doesn't stick
     clearAttachment();
-
     disableWhileWorking(false);
     setStatus("");
   }
