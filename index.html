@@ -160,6 +160,33 @@
       transform: translateY(-1px);
     }
 
+    /* MIC BUTTON (matches size, REORK style) */
+    #micBtn{
+      width:52px;
+      height:52px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      flex:0 0 auto;
+    }
+    #micBtn:active{ transform: translateY(1px); }
+    #micBtn span{
+      font-size: 20px;
+      color: var(--accent);
+      line-height: 1;
+      transform: translateY(1px);
+    }
+    #micBtn.listening{
+      border-color: rgba(255,122,0,.55);
+      box-shadow: 0 0 0 4px rgba(255,122,0,.12);
+      background: rgba(255,122,0,.08);
+    }
+
     /* Input looks like ChatGPT: clears after send, history stays above */
     #inputBox{
       flex:1;
@@ -186,7 +213,7 @@
       box-shadow: 0 0 0 4px rgba(255,122,0,.12);
     }
 
-    /* Attachment pill (inside composer, not that ugly file bar) */
+    /* Attachment pill */
     #attachPill{
       display:none;
       align-items:center;
@@ -259,12 +286,11 @@
       border: 1px solid rgba(255,255,255,.10);
     }
 
-    /* Hidden native file input (we never show it) */
+    /* Hidden native file input */
     #fileInput{
       display:none;
     }
 
-    /* Small helper text */
     #hint{
       margin-top:10px;
       color: rgba(255,255,255,.55);
@@ -294,15 +320,19 @@
 
     <div id="composer">
       <div id="composeRow">
-        <button id="attachBtn" type="button" title="Attach PDF">
+        <button id="attachBtn" type="button" title="Attach file">
           <span>+</span>
+        </button>
+
+        <button id="micBtn" type="button" title="Voice input">
+          <span>🎤</span>
         </button>
 
         <div id="inputBox">
           <textarea id="input" placeholder="Ask REORK anything..."></textarea>
 
           <div id="attachPill">
-            <span class="tag">PDF</span>
+            <span class="tag" id="attachTag">FILE</span>
             <span class="name" id="attachName"></span>
             <button id="removeAttach" type="button" title="Remove">×</button>
           </div>
@@ -319,29 +349,26 @@
         <div class="status">Enter to send • Shift+Enter for new line</div>
       </div>
 
-      <input id="fileInput" type="file" accept="application/pdf,.pdf" />
+      <!-- Allow PDFs + images. Backend will read PDFs today; images are groundwork for later. -->
+      <input id="fileInput" type="file" accept="application/pdf,.pdf,image/png,image/jpeg,image/jpg,.png,.jpg,.jpeg" />
     </div>
   </div>
 
 <script>
 /**
- * IMPORTANT:
- * This file keeps the same behavior structure used in the 400+ line version:
- * - Chat bubbles
- * - Send to backend with optional PDF via FormData
- * - Keeps history in UI
- * - Reset clears UI + clears local conversation
- *
- * If your existing code had a specific API URL, put it below exactly as it was.
+ * This version keeps your structure and UI, but fixes:
+ * - Frontend sending sessionId (backend memory)
+ * - Frontend sending files correctly (FormData)
+ * - Clears attachment after send (so it doesn't stick)
+ * - Adds mic button (speech-to-text) in the same composer row
+ * - Reset also clears backend memory via /api/reset
  */
 
 // ==============================
-// CONFIG (KEEP YOUR EXISTING URL)
+// CONFIG
 // ==============================
-const API_URL = "https://reork-backend.onrender.com/api/chat"; 
-// Example: "https://work-backend.onrender.com/api/chat"
-
-// How many prior messages to include when sending (frontend context)
+const API_URL = "https://reork-backend.onrender.com/api/chat";
+const RESET_URL = "https://reork-backend.onrender.com/api/reset";
 const FRONTEND_CONTEXT_LIMIT = 20;
 
 // ==============================
@@ -349,6 +376,17 @@ const FRONTEND_CONTEXT_LIMIT = 20;
 // ==============================
 let messages = []; // {role:"user"|"assistant", content:"..."}
 let attachedFile = null;
+
+// Persist a sessionId so backend memory works per user session
+let sessionId = localStorage.getItem("reork_sessionId");
+if (!sessionId) {
+  sessionId = "sess_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+  localStorage.setItem("reork_sessionId", sessionId);
+}
+
+// Speech recognition state
+let recognition = null;
+let isListening = false;
 
 // ==============================
 // DOM
@@ -358,9 +396,11 @@ const inputEl = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
 const resetBtn = document.getElementById("resetBtn");
 const attachBtn = document.getElementById("attachBtn");
+const micBtn = document.getElementById("micBtn");
 const fileInput = document.getElementById("fileInput");
 const attachPill = document.getElementById("attachPill");
 const attachName = document.getElementById("attachName");
+const attachTag = document.getElementById("attachTag");
 const removeAttach = document.getElementById("removeAttach");
 const statusText = document.getElementById("statusText");
 
@@ -388,8 +428,6 @@ function addBubble(text, who){
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-
-  // Keep it simple: plain text rendering (no markdown parser here)
   bubble.textContent = text;
 
   const meta = document.createElement("div");
@@ -417,57 +455,68 @@ function clearAttachment(){
   fileInput.value = "";
   attachPill.style.display = "none";
   attachName.textContent = "";
+  attachTag.textContent = "FILE";
 }
 
 function showAttachment(file){
   attachedFile = file;
   attachName.textContent = file.name;
+
+  const name = (file.name || "").toLowerCase();
+  const type = (file.type || "").toLowerCase();
+
+  if (type.includes("pdf") || name.endsWith(".pdf")) attachTag.textContent = "PDF";
+  else if (type.includes("png") || name.endsWith(".png")) attachTag.textContent = "PNG";
+  else if (type.includes("jpeg") || type.includes("jpg") || name.endsWith(".jpg") || name.endsWith(".jpeg")) attachTag.textContent = "JPG";
+  else attachTag.textContent = "FILE";
+
   attachPill.style.display = "inline-flex";
 }
 
 function getTrimmedContext(){
-  // send only the last N messages (frontend context)
   if (messages.length <= FRONTEND_CONTEXT_LIMIT) return messages;
   return messages.slice(messages.length - FRONTEND_CONTEXT_LIMIT);
 }
 
 function ensureApiConfigured(){
-  if (!API_URL || API_URL.includes("YOUR_EXISTING_RENDER_BACKEND_URL_HERE")) {
+  if (!API_URL) {
     addAssistant("Backend URL isn’t set in index.html yet. Add your Render /api/chat URL into API_URL, then refresh.");
     return false;
   }
   return true;
 }
 
+function disableWhileWorking(on){
+  sendBtn.disabled = !!on;
+  attachBtn.disabled = !!on;
+  micBtn.disabled = !!on;
+  resetBtn.disabled = !!on;
+}
+
 // ==============================
 // BACKEND CALL
 // ==============================
 async function sendToBackend(userText){
-  // Uses FormData to support optional PDF upload (same pattern as your previous build)
   const fd = new FormData();
 
-  // user prompt
+  // Backend expects these fields:
   fd.append("message", userText);
+  fd.append("sessionId", sessionId);
 
-  // conversation context
+  // Keep sending history (even if backend ignores it today, it doesn't break anything)
   fd.append("history", JSON.stringify(getTrimmedContext()));
 
-  // optional file
   if (attachedFile) {
     fd.append("file", attachedFile, attachedFile.name);
   }
 
-  const resp = await fetch(API_URL, {
-    method: "POST",
-    body: fd
-  });
+  const resp = await fetch(API_URL, { method: "POST", body: fd });
 
   if (!resp.ok) {
     const t = await resp.text().catch(()=> "");
     throw new Error(`Backend error (${resp.status}): ${t || resp.statusText}`);
   }
 
-  // Supports either JSON {reply:"..."} or plain text
   const contentType = resp.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
     const data = await resp.json();
@@ -477,70 +526,148 @@ async function sendToBackend(userText){
   }
 }
 
+async function resetBackendMemory(){
+  // Not fatal if it fails, but we try.
+  try{
+    await fetch(RESET_URL, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify({ sessionId })
+    });
+  }catch(_){}
+}
+
 // ==============================
 // UI EVENTS
 // ==============================
-attachBtn.addEventListener("click", () => {
-  fileInput.click();
-});
+attachBtn.addEventListener("click", () => fileInput.click());
 
 fileInput.addEventListener("change", () => {
   const f = fileInput.files && fileInput.files[0];
   if (!f) return;
-  // PDF only (matches accept, but double-check)
-  const isPdf = (f.type === "application/pdf") || f.name.toLowerCase().endsWith(".pdf");
-  if (!isPdf) {
-    clearAttachment();
-    addAssistant("For now, PDF only. Please choose a .pdf file.");
-    return;
-  }
   showAttachment(f);
 });
 
-removeAttach.addEventListener("click", () => {
-  clearAttachment();
-});
+removeAttach.addEventListener("click", () => clearAttachment());
 
-resetBtn.addEventListener("click", () => {
-  // Clear UI
+resetBtn.addEventListener("click", async () => {
+  // Clear UI + local history
   chatEl.innerHTML = "";
-  // Clear local history
   messages = [];
-  // Clear attachment
   clearAttachment();
-  // Clear input
   inputEl.value = "";
   setStatus("");
-  // Re-add the initial helper message (same vibe as you liked)
-  addAssistant("Hey. Tell me what you're working through, and I'll walk with you step by step.\n\nIf you're sharing numbers (price, rate, dates, totals), paste them and I'll translate it into plain English.");
+
+  // Clear backend memory too
+  await resetBackendMemory();
+
+  addAssistant("Tell me what’s going on, and we’ll work through it together.");
 });
 
+// ==============================
+// VOICE INPUT (Speech → Text)
+// ==============================
+function getSpeechRecognition(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  const r = new SR();
+  r.lang = "en-US";
+  r.interimResults = true;
+  r.continuous = false;
+  return r;
+}
+
+function startListening(){
+  if (isListening) return;
+
+  const r = getSpeechRecognition();
+  if (!r) {
+    addAssistant("Voice input isn’t supported in this browser. If you want it, use Chrome on desktop.");
+    return;
+  }
+
+  recognition = r;
+  isListening = true;
+  micBtn.classList.add("listening");
+  setStatus("Listening…");
+
+  let finalText = "";
+
+  recognition.onresult = (event) => {
+    let interim = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const chunk = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalText += chunk;
+      else interim += chunk;
+    }
+
+    // Show interim in the input without committing it permanently
+    const base = inputEl.value;
+    // If user is actively typing, we don't wipe it. We append voice after a space.
+    const prefix = base && !base.endsWith(" ") ? base + " " : base;
+    inputEl.value = prefix + (finalText || interim);
+  };
+
+  recognition.onerror = () => {
+    stopListening();
+    setStatus("");
+  };
+
+  recognition.onend = () => {
+    stopListening();
+  };
+
+  try{
+    recognition.start();
+  }catch(_){
+    stopListening();
+  }
+}
+
+function stopListening(){
+  isListening = false;
+  micBtn.classList.remove("listening");
+  if (recognition) {
+    try{ recognition.stop(); }catch(_){}
+  }
+  recognition = null;
+  setStatus("");
+}
+
+micBtn.addEventListener("click", () => {
+  if (isListening) stopListening();
+  else startListening();
+});
+
+// ==============================
+// SEND MESSAGE
+// ==============================
 async function handleSend(){
   const text = inputEl.value.trim();
-  if (!text) return;
 
+  // Allow sending even if only a file is attached
+  if (!text && !attachedFile) return;
   if (!ensureApiConfigured()) return;
 
-  // Add user bubble + clear input like ChatGPT
-  addUser(text);
+  // User bubble
+  addUser(text || "[Attached file]");
   inputEl.value = "";
 
-  // Disable send while waiting
-  sendBtn.disabled = true;
+  disableWhileWorking(true);
   setStatus("Thinking...");
 
   try{
-    const reply = await sendToBackend(text);
+    const reply = await sendToBackend(text || "");
     const safeReply = reply && reply.trim() ? reply.trim() : "I didn’t get a response back. Try again.";
     addAssistant(safeReply);
   }catch(err){
     addAssistant("Something went wrong talking to the backend.\n\n" + (err && err.message ? err.message : String(err)));
   }finally{
-    sendBtn.disabled = false;
+    // IMPORTANT: clear attachment after send so it doesn't stick in the bar
+    clearAttachment();
+
+    disableWhileWorking(false);
     setStatus("");
-    // Keep attachment selected unless you want it cleared after send:
-    // If you want auto-clear attachment after each send, uncomment next line:
-    // clearAttachment();
   }
 }
 
@@ -557,7 +684,6 @@ inputEl.addEventListener("keydown", (e) => {
 // INIT
 // ==============================
 (function init(){
-  // Initial message
   addAssistant("Tell me what’s going on, and we’ll work through it together.");
 })();
 </script>
