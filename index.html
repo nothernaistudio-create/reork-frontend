@@ -207,6 +207,10 @@
       padding: 14px 14px;
       font-size: 16px;
       outline:none;
+
+      /* ✅ FIX: make typing look human, not code */
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      letter-spacing: 0.2px;
     }
     #input:focus{
       border-color: rgba(255,122,0,.55);
@@ -357,11 +361,10 @@
 <script>
 /**
  * This version keeps your structure and UI, but fixes:
- * - Frontend sending sessionId (backend memory)
- * - Frontend sending files correctly (FormData)
- * - Clears attachment after send (so it doesn't stick)
- * - Adds mic button (speech-to-text) in the same composer row
- * - Reset also clears backend memory via /api/reset
+ * ✅ Mic “stutter / repeat spam” (interimResults off + no overwrite loop)
+ * ✅ File-only sends include a real message so backend always attaches file text context
+ * ✅ Input font looks normal (CSS change above)
+ * ✅ Reset also clears backend memory via /api/reset
  */
 
 // ==============================
@@ -567,13 +570,19 @@ resetBtn.addEventListener("click", async () => {
 // ==============================
 // VOICE INPUT (Speech → Text)
 // ==============================
+
 function getSpeechRecognition(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return null;
   const r = new SR();
   r.lang = "en-US";
-  r.interimResults = true;
+
+  /* ✅ FIX: interimResults OFF prevents the “word spam / stutter loop” */
+  r.interimResults = false;
+
+  /* ✅ FIX: continuous OFF so it stops cleanly */
   r.continuous = false;
+
   return r;
 }
 
@@ -591,26 +600,19 @@ function startListening(){
   micBtn.classList.add("listening");
   setStatus("Listening…");
 
-  let finalText = "";
-
   recognition.onresult = (event) => {
-    let interim = "";
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const chunk = event.results[i][0].transcript;
-      if (event.results[i].isFinal) finalText += chunk;
-      else interim += chunk;
-    }
+    // ✅ Only take the final transcript ONCE
+    const spoken = (event.results && event.results[0] && event.results[0][0] && event.results[0][0].transcript)
+      ? event.results[0][0].transcript
+      : "";
 
-    // Show interim in the input without committing it permanently
-    const base = inputEl.value;
-    // If user is actively typing, we don't wipe it. We append voice after a space.
-    const prefix = base && !base.endsWith(" ") ? base + " " : base;
-    inputEl.value = prefix + (finalText || interim);
+    const existing = inputEl.value.trim();
+    const combined = existing ? (existing + " " + spoken).trim() : spoken.trim();
+    inputEl.value = combined;
   };
 
   recognition.onerror = () => {
     stopListening();
-    setStatus("");
   };
 
   recognition.onend = () => {
@@ -643,14 +645,19 @@ micBtn.addEventListener("click", () => {
 // SEND MESSAGE
 // ==============================
 async function handleSend(){
-  const text = inputEl.value.trim();
+  let text = inputEl.value.trim();
+
+  // ✅ FIX: If user attaches a file with no text, we still send a message
+  // so backend always has a “user message” plus file text context.
+  const fileOnly = (!text && !!attachedFile);
+  if (fileOnly) text = "I attached a document. Please read it and guide me step-by-step.";
 
   // Allow sending even if only a file is attached
   if (!text && !attachedFile) return;
   if (!ensureApiConfigured()) return;
 
   // User bubble
-  addUser(text || "[Attached file]");
+  addUser(fileOnly ? "[Attached file]" : text);
   inputEl.value = "";
 
   disableWhileWorking(true);
