@@ -701,6 +701,21 @@ async function submitQuickAnswer() {
     btn.disabled = false;
   }
 }
+  // Detect Stripe return
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('payment') === 'success') {
+  const savedData = localStorage.getItem('reorkFormData');
+
+  if (savedData) {
+    fetch('https://reork-backend.onrender.com/api/quick-answer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: savedData
+    });
+
+    localStorage.removeItem('reorkFormData');
+  }
+}
 </script>
 
 </body>
