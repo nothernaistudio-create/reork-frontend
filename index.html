@@ -674,6 +674,11 @@ async function submitQuickAnswer() {
 
   btn.textContent = 'Redirecting to payment...';
   btn.disabled = true;
+  localStorage.setItem('reorkFormData', JSON.stringify({
+  name,
+  email,
+  text
+}));
 
   try {
     const response = await fetch('https://reork-backend.onrender.com/create-checkout-session', {
