@@ -707,27 +707,44 @@ if (urlParams.get('payment') === 'success') {
   const savedData = localStorage.getItem('reorkFormData');
 
   if (savedData) {
-    fetch('https://reork-backend.onrender.com/api/quick-answer', {
+  let success = false;
+
+  try {
+    const response = await fetch('https://reork-backend.onrender.com/api/quick-answer', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: savedData
     });
 
-    localStorage.removeItem('reorkFormData');
+    if (response.ok) {
+      success = true;
+    }
+  } catch (err) {
+    console.error('Post-payment submission error:', err);
+  }
+
+  localStorage.removeItem('reorkFormData');
+
   const form = document.getElementById('reorkFormData') || document.querySelector('form');
-if (form) {
-  form.innerHTML = `
-    <div style="
-      text-align:center; padding:48px 24px;
-      background:#1a1a1a; border-radius:12px;
-      border:1px solid #f97316;
-    ">
-      <div style="font-size:56px; margin-bottom:16px;">✅</div>
-      <h2 style="color:#f97316; font-size:26px; margin-bottom:10px; font-weight:700;">YOU'RE ALL SET</h2>
-      <p style="color:#e5e7eb; font-size:16px; margin-bottom:6px;">Payment received. Your document is being processed.</p>
-      <p style="color:#e5e7eb; font-size:16px;">You will receive your summary by email — usually within minutes.</p>
-    </div>
-  `;
+  if (form) {
+    if (success) {
+      form.innerHTML = `
+        <div style="text-align:center; padding:48px 24px; background:#1a1a1a; border-radius:12px; border:1px solid #f97316;">
+          <div style="font-size:56px; margin-bottom:16px;">✅</div>
+          <h2 style="color:#f97316; font-size:26px; margin-bottom:10px; font-weight:700;">YOU'RE ALL SET</h2>
+          <p style="color:#e5e7eb; font-size:16px;">Payment received. Your document is being processed.</p>
+        </div>
+      `;
+    } else {
+      form.innerHTML = `
+        <div style="text-align:center; padding:48px 24px;">
+          <p style="color:#ef4444; font-size:16px;">
+            Something went wrong. Please email help@reorkai.com and we will process your document manually.
+          </p>
+        </div>
+      `;
+    }
+  }
 }
    } 
   }
