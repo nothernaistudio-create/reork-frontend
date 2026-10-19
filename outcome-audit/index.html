@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REORK OutcomeProof · Workflow Outcome Audit</title>
+<meta name="description" content="A fixed-scope REORK audit for automations that complete but do not deliver the expected business result.">
+<style>
+:root{color-scheme:dark;--bg:#0c0d0f;--panel:#1b1b1e;--line:#414248;--orange:#ff7419;--muted:#bbbcc2;--white:#f3f3f6;--ok:#69cf96;--warn:#ffd08e}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(700px 450px at 90% 0%,#352011,transparent),var(--bg);font:16px/1.55 system-ui,Arial,sans-serif;color:var(--white)}
+header,main,footer{max-width:1120px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+.brand{font-size:25px;font-weight:900;letter-spacing:.08em}.brand span,.eyebrow{color:var(--orange)}header a{color:inherit;text-decoration:none}
+main{padding-top:42px;padding-bottom:85px}.eyebrow{text-transform:uppercase;font-size:12px;letter-spacing:.15em;font-weight:850}h1{font-size:clamp(36px,6vw,72px);letter-spacing:-.05em;line-height:1.09;margin:14px 0}h1 em{font-style:normal;color:var(--orange)}h2{font-size:28px;margin:8px 0}p{margin:10px 0}.sub{color:var(--muted)}.hero,.twocol,.controls,.three{display:grid;gap:18px}.hero{grid-template-columns:1.15fr .85fr;align-items:center}.twocol{grid-template-columns:repeat(2,minmax(0,1fr))}.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{border:1px solid var(--line);border-radius:16px;padding:24px;background:var(--panel)}.card h3{margin-top:5px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}.button,button{display:inline-block;min-height:44px;background:var(--orange);color:#120b05;font:inherit;font-weight:800;border:0;border-radius:9px;padding:12px 16px;text-decoration:none;cursor:pointer}.button.secondary{background:#333438;color:white;border:1px solid var(--line)}
+.row{display:flex;gap:14px;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0}.row:last-child{border:0}.ok{color:var(--ok)}.warn{color:var(--warn)}.red{color:#ff8888}section{margin-top:46px}.controls{grid-template-columns:1.5fr .7fr .7fr 1.3fr;margin:20px 0}label{display:block;font-weight:650;font-size:13px;margin-bottom:6px}input{background:#101115;color:#fff;border:1px solid #6b6c73;border-radius:8px;padding:10px;font:inherit;width:100%}input:focus{outline:2px solid var(--orange)}#verdict{padding:17px;background:#101115;border-left:4px solid var(--orange);border-radius:4px;margin-top:18px;min-height:80px}#verdict strong{font-size:18px}#verdict p{margin:3px 0}.price{font-size:38px;font-weight:850}.price small{font-size:14px;letter-spacing:0;color:var(--muted)}li{margin-bottom:7px}details{border:1px solid var(--line);padding:16px;border-radius:10px}summary{cursor:pointer;font-weight:750}footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px}a{color:var(--orange)}@media(max-width:800px){.hero,.twocol,.three{grid-template-columns:1fr}.controls{grid-template-columns:1fr 1fr}}@media(max-width:480px){.controls{grid-template-columns:1fr}.actions{flex-direction:column}.button{display:block;text-align:center}}
+</style></head>
+<body><header><a class="brand" href="https://reorkai.com">REORK <span>AI</span></a><small class="sub">OUTCOMEPROOF · ONE-WORKFLOW PILOT</small></header>
+<main>
+<div class="hero"><div><div class="eyebrow">A real-work outcome audit</div><h1>Green check.<br><em>Zero results?</em></h1>
+<p class="sub" style="font-size:19px">An automation can run successfully without actually completing the job. We review the expected outcome, the workflow execution and independent destination evidence.</p>
+<div class="actions"><a class="button" href="#demo">Try the evidence demo</a><a class="button secondary" href="#pilot">Review pilot scope</a></div>
+<p class="sub"><small>Read-only first. Existing tools stay in place. No new subscription required for a one-time assessment.</small></p></div>
+<div class="card"><div class="eyebrow">Illustrative example · not a customer result</div><h2>Automation succeeded</h2>
+<div class="row"><span>Platform execution</span><b class="ok">SUCCESS</b></div>
+<div class="row"><span>Expected CRM records</span><strong>1</strong></div>
+<div class="row"><span>Observed CRM records</span><strong class="red">0</strong></div>
+<div class="row"><span>Independent destination proof</span><strong class="warn">MISSING</strong></div>
+<p class="sub"><small>The run status proves a process ran, not that the required business outcome occurred.</small></p></div></div>
+<section id="demo"><div class="eyebrow">Free demonstration</div><h2>Compare a goal with a claimed result</h2>
+<p class="sub">Try the example without an account. Data stays in your browser. This demo cannot verify external receipts; our pilot service handles that investigation.</p>
+<div class="card"><div class="controls">
+<div><label for="goal">Required business outcome</label><input id="goal" value="CRM leads created"></div>
+<div><label for="min">Minimum expected</label><input id="min" type="number" min="0" step="1" value="1"></div>
+<div><label for="got">Actually observed</label><input id="got" type="number" min="0" step="1" value="0" placeholder="Unknown"></div>
+<div><label for="receipt">External evidence reference</label><input id="receipt" placeholder="CRM record ID (if known)"></div>
+</div><button type="button" id="run">Check evidence status</button>
+<div id="verdict" role="status" aria-live="polite"><strong>Ready</strong><p>Run the sample outcome check.</p></div></div></section>
+<section><div class="eyebrow">A defined delivered result</div><h2>What the review includes</h2><div class="three">
+<div class="card"><h3>1 · Expected outcome</h3><p>One workflow, one trigger and one destination result, with the test agreed before investigation.</p></div>
+<div class="card"><h3>2 · Run-to-result proof</h3><p>Match execution logs to one allowed destination snapshot or receipt and flag unknowns explicitly.</p></div>
+<div class="card"><h3>3 · Repair guidance</h3><p>Document the missing check, responsible handoff and practical native safeguards. Remediation is a separate scope.</p></div>
+</div></section>
+<section id="pilot"><div class="twocol"><div class="card"><div class="eyebrow">Fixed-deliverable pilot proposal</div><h2>One-workflow outcome audit</h2>
+<div class="price">CA$149 <small>proposed price · scope confirmation required</small></div>
+<ul><li>One n8n, Zapier, Make or equivalent workflow</li><li>One expected business destination action</li><li>Read-only review of redacted run logs and destination evidence</li><li>One concise evidence report with specific next corrective step</li></ul>
+<p class="sub"><small>No guarantee of repair, legal compliance, revenue or new account access. No recurring subscription or paid API required for this review.</small></p>
+</div><div class="card"><div class="eyebrow">Email-only · no call required</div><h2>Scope before access</h2><p>To assess the work, we need:</p>
+<ol><li>What the existing workflow is supposed to accomplish</li><li>An authorized redacted execution/workflow export</li><li>One allowed destination result or source record for comparison</li></ol>
+<p><strong>Do not share passwords, tokens, personal contacts or customer secrets.</strong></p>
+<a class="button" href="mailto:info@reorkai.com?subject=OutcomeProof%20workflow%20audit%20scope&amp;body=Platform%3A%0AExpected%20result%3A%0AAvailable%20redacted%20evidence%3A">Request scope review</a>
+<p class="sub"><small>Draft offer. No payments collected on this page.</small></p></div></div></section>
+<section><details><summary>Why not use a free native empty-output alert?</summary><p>You often should. Most automation platforms already include IF branches, Stop-and-Error steps and alerts. We do not sell those features as new technology. The separate paid job, when justified, is tracing what happened across the workflow and the receiving business system, testing the expected outcome and delivering a repeatable acceptance test.</p></details></section>
+</main><footer>REORK AI · Orange, charcoal and grey. Concept pilot · No customer wins claimed · <a href="https://reorkai.com">reorkai.com</a></footer>
+<script>
+(function(){
+const get=id=>document.getElementById(id);
+const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function verify(){
+const goal=get('goal').value.trim(),min=get('min').value.trim(),got=get('got').value.trim(),ref=get('receipt').value.trim();let title='OUTCOME NOT VERIFIED',why='A successful execution alone is insufficient.';
+if(!goal||min===''||!Number.isInteger(Number(min))||Number(min)<0){title='INVALID INPUT';why='Provide a goal and non-negative integer minimum.'}
+else if(got!==''&&(!Number.isInteger(Number(got))||Number(got)<0)){title='INVALID INPUT';why='Observed count must be a non-negative integer.'}
+else if(got!==''&&Number(got)<Number(min)){title='REPORTED MISMATCH';why='Observed '+Number(got)+' of '+Number(min)+' expected. Verify the destination count and trace why records are missing.'}
+else if(got!==''&&Number(got)>=Number(min)&&ref){title='EVIDENCE REFERENCE PROVIDED';why='A destination reference was supplied, but this demo cannot independently authenticate or match it to the workflow.'}
+else if(got!==''&&Number(got)>=Number(min)){title='UNVERIFIED WITHOUT RECEIPT';why='The reported count meets the target, but external completion has no verifiable reference.'}
+else{why='Enter the observed outcome from the destination, not just the workflow run status.'}
+get('verdict').innerHTML='<strong>'+safe(title)+'</strong><p>'+safe(why)+'</p>';return title;
+}
+get('run').addEventListener('click',verify);window.REORK_OUTCOME_DEMO={verify};
+})();
+</script></body></html>
