@@ -16,4 +16,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test outcome-audit/outcome-audit.test.js
+      - run: node --test outcome-audit/outcome-audit.test.js outcome-audit/reconcile-send-records.test.js
