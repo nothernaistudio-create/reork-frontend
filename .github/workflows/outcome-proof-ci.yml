@@ -1,0 +1,19 @@
+name: OutcomeProof Pilot Test
+on:
+  pull_request:
+    paths:
+      - 'outcome-audit/**'
+      - '.github/workflows/outcome-proof-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  demo-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test outcome-audit/outcome-audit.test.js outcome-audit/reconcile-send-records.test.js
