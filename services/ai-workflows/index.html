@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REORK AI | Get the Work Done</title>
+<meta name="description" content="Map a repetitive business workflow into a concrete AI implementation brief. No account or upload required.">
+<style>
+:root{color-scheme:dark;--bg:#0d0e10;--panel:#1d1f23;--line:#393b42;--accent:#ff721c;--ink:#f3f3f5;--muted:#b8b9bf;--okay:#9de0aa}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 75% 0,#322017 0,transparent 55%),var(--bg);color:var(--ink);font:16px/1.55 system-ui,Arial,sans-serif}a{color:var(--accent)}.wrap{width:min(1090px,calc(100% - 36px));margin:auto}header{padding:20px 0;border-bottom:1px solid var(--line)}header .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px}header strong{font-size:23px;letter-spacing:.07em}header strong span,.accent{color:var(--accent)}header small{color:var(--muted)}main{padding:45px 0 65px}h1{font-size:clamp(33px,5.2vw,65px);line-height:1.07;letter-spacing:-.04em;max-width:760px;margin:14px 0}h2{font-size:26px;line-height:1.2;margin:0 0 12px}.lead{max-width:790px;font-size:18px;color:var(--muted)}.eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;margin-top:33px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:23px}.step{margin-bottom:21px}.step p{margin:3px 0 10px;color:var(--muted)}label{font-weight:650;font-size:14px;display:block;margin:0 0 7px}.check{display:flex;align-items:flex-start;gap:9px;background:#141518;border:1px solid #353740;border-radius:9px;margin-top:8px;padding:12px;cursor:pointer}.check input{margin-top:4px;accent-color:var(--accent);width:17px;height:17px}.check span{flex:1}.check strong{display:block}.check small{display:block;color:var(--muted);font-size:12px}input[type=text],input[type=number],select,textarea{width:100%;background:#101114;color:white;border:1px solid #777982;border-radius:9px;padding:11px 12px;font:inherit}textarea{min-height:85px;resize:vertical}input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:2px}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}button,.button{display:inline-block;border:0;border-radius:10px;min-height:44px;padding:12px 17px;cursor:pointer;background:var(--accent);color:#1d120a;font:inherit;font-weight:800;text-decoration:none}button.secondary{background:#393b40;color:white;border:1px solid #61636b}button:disabled{opacity:.5;cursor:not-allowed}.row{display:flex;gap:10px;flex-wrap:wrap}.metric{font-size:32px;font-weight:850}.muted{color:var(--muted)}#result{white-space:pre-wrap;background:#101114;border-radius:11px;border:1px solid var(--line);padding:14px;margin:12px 0;max-height:320px;overflow:auto;font-size:13px;word-break:break-word}#savings{font-weight:800;color:var(--okay)}.privacy{border-left:3px solid var(--accent);padding-left:12px;color:var(--muted);font-size:13px}.offer{margin-top:25px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.offer .card{min-height:182px}.offer strong{color:var(--accent);font-size:23px}footer{border-top:1px solid var(--line);padding:23px 0;color:var(--muted);font-size:13px}#warn{color:#ffce90;font-size:14px;min-height:23px}a.button:focus-visible,button:focus-visible{outline:3px solid white}@media(max-width:820px){.grid,.offer{grid-template-columns:1fr}}@media(max-width:530px){.two{grid-template-columns:1fr}.wrap{width:min(100% - 26px,1090px)}.card{padding:17px}}
+</style></head><body>
+<header><div class="wrap"><strong>REORK <span>AI</span></strong><small>Workflow Implementation Studio · Request a Fixed-Price Scope</small></div></header>
+<main class="wrap">
+<div class="eyebrow">Finished work, not more software to manage</div>
+<h1>Which job do you want <span class="accent">off your desk?</span></h1>
+<p class="lead">Describe the work your team keeps repeating. Get a specific implementation brief you can review, copy or send to REORK. The questions run locally in your browser. No account, files or payment required.</p>
+<div class="grid">
+<form class="card" id="intake" novalidate>
+<h2>Describe one business bottleneck</h2>
+<div class="step"><label>1. What keeps getting stuck? (choose up to three)</label>
+<label class="check"><input type="checkbox" name="problem" value="lead_response"><span><strong>Leads aren't handled fast enough</strong><small>New inquiries, follow-ups and status updates</small></span></label>
+<label class="check"><input type="checkbox" name="problem" value="quote_handoff"><span><strong>Quotes and job details get re-entered</strong><small>From requests to estimates, orders or work orders</small></span></label>
+<label class="check"><input type="checkbox" name="problem" value="invoice_followup"><span><strong>Billing and payment follow-up is manual</strong><small>Matching approved work to invoices and reminders</small></span></label>
+<label class="check"><input type="checkbox" name="problem" value="data_reconciliation"><span><strong>Information disagrees between systems</strong><small>Exports, records, missing fields and repeated corrections</small></span></label>
+<label class="check"><input type="checkbox" name="problem" value="report_delivery"><span><strong>Reports don't arrive as promised</strong><small>Missing handoffs, approvals and outcome verification</small></span></label>
+</div>
+<div class="step"><label for="tools">2. What tools do you already use?</label><input id="tools" type="text" maxlength="180" placeholder="e.g. Gmail, Sheets, QuickBooks, Jobber, Shopify"><p>We work with existing tools first. No new platform is assumed.</p></div>
+<div class="step"><label for="outcome">3. What exact result must happen?</label><textarea id="outcome" maxlength="500" placeholder="e.g. Every approved job becomes an invoice by end of day, with exceptions sent for approval" required></textarea></div>
+<div class="step"><label>4. Estimate current manual workload</label><div class="two"><div><label for="volume">Times per month</label><input id="volume" type="number" min="1" max="100000" value="40" required></div><div><label for="minutes">Minutes per occurrence</label><input id="minutes" type="number" min="1" max="1440" value="15" required></div></div><p>Used only to estimate time currently spent, not to claim automatic savings.</p></div>
+<div class="step"><label for="deadline">5. How urgent?</label><select id="deadline"><option value="this_week">Needs attention this week</option><option value="this_month" selected>Would help this month</option><option value="exploring">Just investigating</option></select></div>
+<div class="step"><label for="sensitive">6. Is the process handling restricted personal or regulated data?</label><select id="sensitive"><option value="unknown">I'm not sure</option><option value="no">No, routine business information</option><option value="yes">Yes, personal, health, financial or confidential records</option></select></div>
+<div id="warn" aria-live="polite"></div><button type="submit">Create my workflow brief</button>
+</form>
+<aside class="card"><div class="eyebrow">What REORK will assess</div><h2>A completed business result</h2><p class="muted">Before proposing software, we identify the handoff you want removed, the existing platform features, the required data, privacy constraints and a way to prove the outcome happened.</p>
+<div class="step"><strong>1. Observe</strong><p>Find the exact repeated step or exception, including existing native features.</p></div><div class="step"><strong>2. Prove</strong><p>Define one before/after acceptance test instead of counting AI messages or green workflow runs.</p></div><div class="step"><strong>3. Deliver</strong><p>Scope a fixed-price implementation or tell you when your existing software already solves it.</p></div>
+<div class="privacy">This preview collects nothing automatically. Information stays on this device until you choose to copy the brief or launch an email to info@reorkai.com. Please use descriptions, not names, passwords, medical records or customer files.</div>
+<div style="margin-top:26px"><span class="eyebrow">Time currently spent</span><div id="savings" class="metric">10 h/month</div><small class="muted">Estimated current manual effort. Potential savings must be validated.</small></div></aside>
+</div>
+<section class="card" style="margin-top:20px" id="output" hidden><div class="eyebrow">Your draft · Generated locally</div><h2>Workflow implementation brief</h2><pre id="result" role="status" aria-live="polite"></pre><div class="row"><button id="copy" type="button">Copy brief</button><a id="send" class="button" href="mailto:info@reorkai.com">Email REORK for a scoped offer</a></div><p class="muted" style="font-size:13px">This is an initial diagnostic, not a binding proposal, quote, contract or estimate of savings. REORK reviews feasibility and permissions before accepting any work.</p></section>
+<section style="margin-top:44px"><span class="eyebrow">Fixed deliverables, after review</span><h2>Start small; expand only what works</h2>
+<div class="offer"><div class="card"><strong>Workflow diagnosis</strong><p>One workflow, one outcome, existing-tool review and a written corrective plan.</p><small class="muted">Fixed quote after scope confirmation.</small></div><div class="card"><strong>Single-workflow pilot</strong><p>Implement one tightly bounded handoff with a pass/fail acceptance test and documentation.</p><small class="muted">Scope, integrations and access approved first.</small></div><div class="card"><strong>Multi-system integration</strong><p>Coordinate two to three valuable workflows across existing tools, with staged delivery and approval gates.</p><small class="muted">Larger consulting engagement quoted separately; no guaranteed return.</small></div></div></section>
+</main><footer><div class="wrap">REORK AI · Ontario, Canada · <a href="https://reorkai.com">reorkai.com</a> · <a href="mailto:info@reorkai.com">info@reorkai.com</a> · No subscription required · This is a scope tool, not a working customer integration.</div></footer>
+<script>
+(function(){'use strict';
+const definitions={
+lead_response:['lead intake','Defined inquiry is acknowledged and assigned to the correct follow-up owner'],
+quote_handoff:['quote-to-work handoff','Approved quote and required details reach the target work/order system'],
+invoice_followup:['approved-work billing','Approved job maps to an accurate invoice and exceptions require approval'],
+data_reconciliation:['cross-system consistency','Records with the same key match across the authorized source and destination'],
+report_delivery:['delivery verification','An agreed report reaches the actual destination and is independently confirmed']
+};
+const $=id=>document.getElementById(id);
+function boundedInt(value,min,max){if(!/^\d+$/.test(String(value||'')))return null;const n=Number(value);return Number.isSafeInteger(n)&&n>=min&&n<=max?n:null;}
+function checked(){return [...document.querySelectorAll('input[name="problem"]:checked')].map(x=>x.value);}
+function workload(volume,minutes){return Math.round(volume*minutes/60*10)/10;}
+function escapeUserString(s){return String(s||'').replace(/[\u0000-\u001f\u007f]/g,' ').trim();}
+function recommend(data){
+ const steps=data.ids.map(id=>definitions[id]?.[0]).filter(Boolean),proofs=data.ids.map(id=>definitions[id]?.[1]).filter(Boolean);
+ const current=workload(data.volume,data.minutes);
+ const highRisk=data.sensitive!=='no';
+ const conditions=[highRisk?'Human review of data security, permissions and vendor terms required before tool connections.':'Client approval and least-privilege access still required before integrations.',
+ 'No guarantee the process can be automated until current native features and API/export permissions are checked.',
+ 'External messages, billing actions and production changes require client approval.'];
+ return `REORK AI — WORKFLOW IMPLEMENTATION BRIEF\n\nWhat needs fixing: ${steps.join('; ')}\nExisting platforms: ${data.tools||'Not specified'}\nExpected finished outcome: ${data.outcome}\nEstimated current manual effort: ${data.volume} occurrences × ${data.minutes} minutes = ${current} hours per month (not an estimate of savings).\nUrgency: ${data.deadline.replace('_',' ')}\nSensitive/restricted data: ${data.sensitive}\n\nAcceptance criteria to agree with REORK:\n${proofs.map((s,i)=>`${i+1}. ${s}.`).join('\n')}\n\nBefore work begins:\n${conditions.map((s,i)=>`${i+1}. ${s}`).join('\n')}\n\nRequested next step: asynchronous fixed-price scope review; no calls required initially.\nPrepared locally, not a confirmed client order or quoted price.`;
+}
+function refresh(){const v=boundedInt($('volume').value,1,100000),m=boundedInt($('minutes').value,1,1440);$('savings').textContent=v&&m?`${workload(v,m)} h/month`:'Enter workload';}
+for(const id of ['volume','minutes'])$(id).addEventListener('input',refresh);
+for(const box of document.querySelectorAll('input[name="problem"]'))box.addEventListener('change',()=>{const s=checked();if(s.length>3){box.checked=false;$('warn').textContent='Choose no more than three problems.';}else $('warn').textContent='';});
+let generated='';
+$('intake').addEventListener('submit',e=>{
+ e.preventDefault(); const ids=checked(),volume=boundedInt($('volume').value,1,100000),minutes=boundedInt($('minutes').value,1,1440),outcome=escapeUserString($('outcome').value),tools=escapeUserString($('tools').value);
+ if(ids.length<1||ids.length>3||volume===null||minutes===null||outcome.length<15){$('warn').textContent='Select 1–3 jobs, enter valid workload numbers and describe the finished result (at least 15 characters).';$('output').hidden=true;return;}
+ const data={ids,volume,minutes,outcome,tools,deadline:$('deadline').value,sensitive:$('sensitive').value};
+ generated=recommend(data);$('warn').textContent='';$('result').textContent=generated;$('output').hidden=false;
+ $('send').href='mailto:info@reorkai.com?subject='+encodeURIComponent('REORK workflow scope review')+'&body='+encodeURIComponent(generated);
+ $('output').scrollIntoView({behavior:'smooth',block:'start'});
+});
+$('copy').addEventListener('click',async()=>{if(!generated)return;try{await navigator.clipboard.writeText(generated);$('copy').textContent='Copied';}catch(e){$('copy').textContent='Select brief to copy';const sel=window.getSelection(),range=document.createRange();range.selectNodeContents($('result'));sel.removeAllRanges();sel.addRange(range);}});
+window.REORK_STUDIO={boundedInt,workload,recommend,checked};refresh();
+})();
+</script></body></html>
