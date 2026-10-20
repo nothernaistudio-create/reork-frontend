@@ -27,3 +27,12 @@
 
 ## Safety / owner gate
 This branch is deliberately a DRAFT pull request from REORK static frontend. DO NOT merge or deploy without owner approving the specific CA$149 offer and external posting. No additional subscription, Upwork fee or phone call required. Owner does not need to upload files. Other CEO lanes continue while review is pending.
+
+## Internal real-record acceptance test | Oct 19, 2026
+This audit uses REORK's own real sent business outreach, not fake CSV or green workflow status. Restricted identifiers are intentionally omitted from this candidate public code branch.
+- Source A: authenticated company Gmail `SENT`, 2026-10-16 and Oct17. Three independent agency outreach messages were dispatched at precise recorded times (two Oct16, one Oct17).
+- Source B: production Supabase `public.leads`. The **same three business recipient records** independently contain status `sent`, matching email addresses and `sent_at` timestamps (timezone normalized; database naive timestamps compare to UTC).
+- Case reconciliation result: **3 of 3** newly sent agency outreach entries agree at address and UTC send time between Gmail and CRM. This establishes an internal *send-record match*, NOT inbox delivery, human reading, customer interest, reply or revenue.
+- Separate live condition: approximately 10 other actual REORK company outreach emails from Oct14-17 were also found in company Gmail SENT but were not asserted to belong to the `leads` table; CRM has separate `outreach_results` histories, so do NOT call those missing without joining their actual correct campaign source first. `outreach_results` returned a lifetime total of 237 rows with sent timestamps, a different cohort and scope. An aggregate total compared to three agency leads would be a false discrepancy.
+- The report is one **real run-to-records acceptance example**, independently checked via connected Gmail and Supabase. No private message bodies, tokens, or customer data were published. It is not proof of an external paid customer or successful commercial impact.
+- Remaining SELLABILITY gate: a buyer must have a recurring cross-system discrepancy that native platform checks do not resolve and value an evidence packet at CA$149. Cross-app evidence reconciliation can be a legitimate human-delivered service, but this small internal example does not prove demand or economic ROI.
